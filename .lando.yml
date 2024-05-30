@@ -1,0 +1,16 @@
+name: my-spa-lando
+recipe: laravel
+config:
+  webroot: public
+services:
+  appserver:
+    webroot: public
+    xdebug: true
+    config:
+      php: .lando/php.ini
+    overrides:
+      environment:
+        PHP_IDE_CONFIG: "serverName=appserver"
+  phpmyadmin:
+    type: phpmyadmin
+
