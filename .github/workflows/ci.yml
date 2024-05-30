@@ -4,11 +4,11 @@ jobs:
   test_ci:
     runs-on: ubuntu-latest
     container:
-      image: kirschbaumdevelopment/laravel-test-runner:8.0
+      image: kirschbaumdevelopment/laravel-test-runner:8.2
 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:8.2
         env:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: test
