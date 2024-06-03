@@ -9,7 +9,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $comments = Comment::with('user')->get();
+        $comments = Comment::all();
         return view('home', compact('comments'));
     }
 }
