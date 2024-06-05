@@ -5,13 +5,12 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.2",
         "guzzlehttp/guzzle": "^7.2",
         "klisl/laravel-comments": "^1.8",
-        "laravel/framework": "^9.19",
+        "laravel/framework": "^11.9.2",
         "laravel/sanctum": "^3.0",
-        "laravel/tinker": "^2.7",
-        "spatie/laravel-permission": "^6.3"
+        "laravel/tinker": "^2.9.0",
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.9",

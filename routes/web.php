@@ -16,5 +16,5 @@ Route::post('/comments', [CommentController::class, 'store'])->name('comments.st
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('user.comment.delete');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
+Route::get('/captcha', [CommentController::class, 'captcha'])->name('captcha');
 Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');

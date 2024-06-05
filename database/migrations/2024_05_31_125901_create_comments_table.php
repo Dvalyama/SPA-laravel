@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
 class CreateCommentsTable extends Migration
 {
     /**
@@ -19,6 +18,8 @@ class CreateCommentsTable extends Migration
             $table->string('email');
             $table->string('homepage')->nullable();
             $table->text('text');
+            $table->string('image')->nullable();
+            $table->string('file')->nullable();
             $table->timestamps();
         });
     }
@@ -33,3 +34,4 @@ class CreateCommentsTable extends Migration
         Schema::dropIfExists('comments');
     }
 }
+

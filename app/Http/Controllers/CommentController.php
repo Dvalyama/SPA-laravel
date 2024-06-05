@@ -2,31 +2,92 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Models\Comment;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Session;
+use Carbon\Carbon;
+use Intervention\Image\Facades\Image;
+use App\Http\Controllers\Exception;
 
 class CommentController extends Controller
 {
-    public function index()
+    public function store(Request $request)
     {
-        $comments = Comment::all();
-        return view('home', compact('comments'));
+        $validatedData = $request->validate([
+            'username' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'homepage' => 'nullable|url|max:255',
+            'text' => 'required|string',
+            'captcha' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB limit
+            'file' => 'nullable|mimes:txt|max:100', // 100KB limit
+        ]);
+
+        if ($request->input('captcha') != Session::get('captcha_text')) {
+            return redirect()->back()->withErrors(['captcha' => 'Невірна CAPTCHA'])->withInput();
+        }            
+
+        if ($request->hasFile('image')) {
+            // Обробка зображення
+            $image = $request->file('image');
+            $filename = time() . '.' . $image->getClientOriginalExtension();
+            $path = public_path('images/' . $filename);
+            $image_resize = Image::make($image->getRealPath());
+            $image_resize->resize(320, 240, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+            $image_resize->save($path);
+            $validatedData['image'] = 'images/' . $filename;
+        }
+        
+        
+        if ($request->hasFile('file')) {
+            // Обробка текстового файлу
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('files/'), $filename);
+            $validatedData['file'] = 'files/' . $filename;
+        }
+
+        // Додавання дати до коментаря
+        $validatedData['created_at'] = Carbon::now();
+
+        $comment = Comment::create($validatedData);
+
+        return response()->json(['success' => true, 'comment' => $comment]);
     }
 
-    public function store(Request $request)
-{
-    $request->validate([
-        'username' => 'required|max:255',
-        'email' => 'required|email|max:255',
-        'homepage' => 'nullable|url|max:255',
-        'text' => 'required',
-    ]);
+    public function captcha(Request $request)
+    {
+        $captcha_text = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
+        $request->session()->put('captcha_text', $captcha_text);
 
-    // Логіка для збереження коментаря
-    Comment::create($request->all());
+        $width = 150;
+        $height = 40;
+        $image = imagecreatetruecolor($width, $height);
 
-    return response()->json(['success' => true]);
+        $bg_color = imagecolorallocate($image, 255, 255, 255);
+        $text_color = imagecolorallocate($image, 0, 0, 0);
+
+        imagefilledrectangle($image, 0, 0, $width, $height, $bg_color);
+
+        $font = 5;
+        $x = 10;
+        $y = 10;
+        imagestring($image, $font, $x, $y, $captcha_text, $text_color);
+
+        header('Content-type: image/png');
+        imagepng($image);
+        imagedestroy($image);
+        return $request;
+    }
+    public function index()
+    {
+        // Отримання коментарів з датами
+        $comments = Comment::orderBy('created_at', 'desc')->get();
+        return response()->json(['success' => true, 'comments' => $comments]);
+    }
 }
 
-    
-}
