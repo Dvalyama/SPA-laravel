@@ -31,7 +31,7 @@ class CommentController extends Controller
         if ($request->hasFile('image')) {
             // Обробка зображення
             $image = $request->file('image');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
+            $filename = time() . '_' . $image->getClientOriginalName();
             $path = public_path('images/' . $filename);
             $image_resize = Image::make($image->getRealPath());
             $image_resize->resize(320, 240, function ($constraint) {

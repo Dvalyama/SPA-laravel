@@ -45,7 +45,7 @@ function fetchComments() {
                 ${comment.homepage ? `<a href="${comment.homepage}" target="_blank">${comment.homepage}</a><br>` : ''}
                 ${comment.text}
                 
-                ${comment.image ? `<br><img src="${comment.image}" alt="Image" style="max-width: 100%; height: auto;">` : ''}
+                ${comment.image ? `<br><a href="${comment.image}" data-lightbox="roadtrip"><img src="${comment.image}" alt="Image" style="max-width: 50px; height: auto;"></a>` : ''}
                 
                 ${comment.file ? `<br><a href="${comment.file}" target="_blank">View File</a>` : ''}
             `;

@@ -10,7 +10,8 @@
         "klisl/laravel-comments": "^1.8",
         "laravel/framework": "^11.9.2",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9.0"
+        "laravel/tinker": "^2.9.0",
+        "intervention/image": "^2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.9",
