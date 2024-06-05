@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Rules\Phone;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -27,7 +26,6 @@ class ValidationController extends Controller
             'current_password' => ['required', 'string', 'current_password'], // текущий пароль
             'email' => ['required', 'string', 'max:100', 'email', 'exists:users'], // mail@example.com
             'country_id' => ['required', 'integer', Rule::exists('countries', 'id')->where('active')],
-            'phone' => ['required', 'string', new Phone, Rule::unique('users', 'phone')->ignore($user)],
             'website' => ['nullable', 'string', 'url'], // https://example.com
             'uuid' => ['nullable', 'string', 'uuid'], // уникальний айди
             'ip' => ['nullable', 'string', 'ip'], // 127.0.0.1
