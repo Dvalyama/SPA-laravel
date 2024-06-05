@@ -124,6 +124,7 @@ return [
     ],
 
     'aliases' => [
-        'Image' => Intervention\Image\Facades\Image::class
+        'Image' => Intervention\Image\Facades\Image::class,
+        'Route' => Illuminate\Support\Facades\Route::class
     ],
 ];

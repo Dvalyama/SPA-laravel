@@ -42,7 +42,7 @@
         </div>
         <div class="form-group">
             <label for="image">Image:</label>
-            <input type="file" name="image" class="form-control-file" id="image" accept=".jpg .png">
+            <input type="file" name="image" class="form-control-file" id="image" accept=".jpg, .png">
         </div>
         <div class="form-group">
             <label for="file">Text File:</label>
