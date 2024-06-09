@@ -1,17 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const commentForm = document.getElementById('commentForm');
+// ajax.js
 
-    commentForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        
-        const formData = new FormData(this);
-        
-        sendFormData(formData);
-    });
-
-    fetchComments();
-});
-
+// Функція для відправки даних форми через AJAX
 function sendFormData(formData) {
     fetch('/comments', {
         method: 'POST',
@@ -20,26 +9,37 @@ function sendFormData(formData) {
             'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            console.log('Коментар успішно доданий');
+            console.log('Comment added successfully');
             fetchComments();
             document.getElementById('commentForm').reset();
             document.getElementById('captcha').src = '/captcha?rand=' + Math.random();
             document.getElementById('parent_id').value = ''; // очищення parent_id
         } else {
-            console.error('Не вдалося додати коментар');
+            console.error('Failed to add comment');
         }
     })
     .catch(error => {
-        console.error('Помилка:', error);
+        console.error('Error:', error);
     });
 }
 
+// Функція для отримання списку коментарів через AJAX
 function fetchComments() {
     fetch('/comments')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         const commentsList = document.getElementById('commentsList');
         commentsList.innerHTML = '';
@@ -50,15 +50,15 @@ function fetchComments() {
                 <strong>${comment.username}</strong> (${comment.email}) - ${new Date(comment.created_at).toLocaleString()}<br>
                 ${comment.homepage ? `<a href="${comment.homepage}" target="_blank">${comment.homepage}</a><br>` : ''}
                 ${comment.text}
-                ${comment.image ? `<br><a href="${comment.image}" data-lightbox="roadtrip"><img src="${comment.image}" alt="Зображення" style="max-width: 50px; height: auto;"></a>` : ''}
-                ${comment.file ? `<br><a href="${comment.file}" target="_blank">Переглянути файл</a>` : ''}
-                <button class="btn btn-sm btn-primary reply-button" data-id="${comment.id}">Відповісти</button>
+                ${comment.image ? `<br><a href="${comment.image}" data-lightbox="roadtrip"><img src="${comment.image}" alt="Image" style="max-width: 50px; height: auto;"></a>` : ''}
+                ${comment.file ? `<br><a href="${comment.file}" target="_blank">View File</a>` : ''}
+                <button class="btn btn-sm btn-primary reply-button" data-id="${comment.id}">Reply</button>
                 <ul class="list-group mt-2" id="replies-${comment.id}">
                     ${comment.replies.map(reply => `
                         <li class="list-group-item">
                             <strong>${reply.username}</strong> (${reply.email}) - ${new Date(reply.created_at).toLocaleString()}<br>
                             ${reply.text}
-                            <button class="btn btn-sm btn-secondary reply-button" data-id="${reply.id}">Відповісти</button>
+                            <button class="btn btn-sm btn-secondary reply-button" data-id="${reply.id}">Reply</button>
                         </li>
                     `).join('')}
                 </ul>
@@ -66,7 +66,7 @@ function fetchComments() {
             commentsList.appendChild(commentItem);
         });
 
-        // Додаємо обробники подій для кнопок відповіді
+        // Attach event handlers for the reply buttons
         const replyButtons = document.querySelectorAll('.reply-button');
         replyButtons.forEach(button => {
             button.addEventListener('click', function() {
@@ -76,6 +76,20 @@ function fetchComments() {
         });
     })
     .catch(error => {
-        console.error('Помилка:', error);
+        console.error('Error:', error);
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const commentForm = document.getElementById('commentForm');
+
+    commentForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        sendFormData(formData);
+    });
+
+    fetchComments();
+});

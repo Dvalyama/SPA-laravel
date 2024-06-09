@@ -2,24 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
-    protected $fillable =
-        [   
-            'username',
-            'email',
-            'homepage',
-            'text',
-            'image',
-            'file',
-            'created_at',
-            'parent_id'
-        ];
+    use HasFactory;
+
+    protected $fillable = [
+        'username',
+        'email',
+        'homepage',
+        'text',
+        'image',
+        'file',
+        'parent_id'
+    ];
 
     public function replies()
-    {
-        return $this->hasMany(Comment::class, 'parent_id');
-    }
+{
+    return $this->hasMany(Comment::class, 'parent_id', 'id');
+}
+
 }
