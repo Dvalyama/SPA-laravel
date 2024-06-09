@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comment;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use Intervention\Image\Facades\Image;
-use App\Http\Controllers\Exception;
 
 class CommentController extends Controller
 {
@@ -22,11 +20,12 @@ class CommentController extends Controller
             'captcha' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB limit
             'file' => 'nullable|mimes:txt|max:100', // 100KB limit
+            'parent_id' => 'nullable|integer|exists:comments,id'
         ]);
 
         if ($request->input('captcha') != Session::get('captcha_text')) {
             return redirect()->back()->withErrors(['captcha' => 'Невірна CAPTCHA'])->withInput();
-        }            
+        }
 
         if ($request->hasFile('image')) {
             // Обробка зображення
@@ -41,8 +40,7 @@ class CommentController extends Controller
             $image_resize->save($path);
             $validatedData['image'] = 'images/' . $filename;
         }
-        
-        
+
         if ($request->hasFile('file')) {
             // Обробка текстового файлу
             $file = $request->file('file');
@@ -57,6 +55,13 @@ class CommentController extends Controller
         $comment = Comment::create($validatedData);
 
         return response()->json(['success' => true, 'comment' => $comment]);
+    }
+
+    public function index()
+    {
+        // Отримання коментарів з дочірніми коментарями
+        $comments = Comment::whereNull('parent_id')->with('replies')->orderBy('created_at', 'desc')->get();
+        return response()->json(['success' => true, 'comments' => $comments]);
     }
 
     public function captcha(Request $request)
@@ -82,12 +87,6 @@ class CommentController extends Controller
         imagepng($image);
         imagedestroy($image);
         return $request;
-    }
-    public function index()
-    {
-        // Отримання коментарів з датами
-        $comments = Comment::orderBy('created_at', 'desc')->get();
-        return response()->json(['success' => true, 'comments' => $comments]);
     }
 }
 
