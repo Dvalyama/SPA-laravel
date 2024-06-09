@@ -19,7 +19,7 @@ class Comment extends Model
         'parent_id'
     ];
 
-    public function comments()
+    public function replies()
 {
     return $this->hasMany(Comment::class, 'parent_id', 'id');
 }
