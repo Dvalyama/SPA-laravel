@@ -13,4 +13,3 @@ services:
         PHP_IDE_CONFIG: "serverName=appserver"
   phpmyadmin:
     type: phpmyadmin
-
