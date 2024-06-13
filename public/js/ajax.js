@@ -22,8 +22,11 @@ function sendFormData(formData) {
             document.getElementById('commentForm').reset();
             document.getElementById('captcha').src = '/captcha?rand=' + Math.random();
             document.getElementById('parent_id').value = ''; // очищення parent_id
+            document.getElementById('captcha_error').style = 'display:none';
         } else {
             console.error('Failed to add comment');
+            document.getElementById('captcha').src = '/captcha?rand=' + Math.random();
+            document.getElementById('captcha_error').style = 'display:block';
         }
     })
     .catch(error => {
@@ -43,9 +46,11 @@ function fetchComments() {
     .then(data => {
         const commentsList = document.getElementById('commentsList');
         commentsList.innerHTML = '';
-        data.comments.forEach(comment => {
+        Object.keys(data.comments).forEach(id => {
+            const comment = data.comments[id].comment
             const commentItem = document.createElement('li');
             commentItem.classList.add('list-group-item');
+            commentItem.style = `--depth:${data.comments[id].level}`
             commentItem.innerHTML = `
                 <strong>${comment.username}</strong> (${comment.email}) - ${new Date(comment.created_at).toLocaleString()}<br>
                 ${comment.homepage ? `<a href="${comment.homepage}" target="_blank">${comment.homepage}</a><br>` : ''}
@@ -53,15 +58,6 @@ function fetchComments() {
                 ${comment.image ? `<br><a href="${comment.image}" data-lightbox="roadtrip"><img src="${comment.image}" alt="Image" style="max-width: 50px; height: auto;"></a>` : ''}
                 ${comment.file ? `<br><a href="${comment.file}" target="_blank">View File</a>` : ''}
                 <button class="btn btn-sm btn-primary reply-button" data-id="${comment.id}">Reply</button>
-                <ul class="list-group mt-2" id="replies-${comment.id}">
-                    ${comment.replies.map(reply => `
-                        <li class="list-group-item">
-                            <strong>${reply.username}</strong> (${reply.email}) - ${new Date(reply.created_at).toLocaleString()}<br>
-                            ${reply.text}
-                            <button class="btn btn-sm btn-secondary reply-button" data-id="${reply.id}">Reply</button>
-                        </li>
-                    `).join('')}
-                </ul>
             `;
             commentsList.appendChild(commentItem);
         });

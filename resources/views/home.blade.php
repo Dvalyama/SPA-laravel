@@ -6,6 +6,11 @@
     <title>Коментарі</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+    <style>
+    .list-group-item {
+        padding-left: calc(15px * var(--depth));
+    }
+</style>
 </head>
 <body>
 <div class="container">
@@ -35,6 +40,7 @@
             <label for="captcha">CAPTCHA</label>
             <img src="{{ route('captcha') }}" alt="CAPTCHA Image" id="captcha">
             <input type="text" id="captcha_input" name="captcha" pattern="[A-Za-z0-9]+" required>
+            <span id="captcha_error" class="invalid-feedback">CAPTCHA невірна,введіть ще раз</span>
         </div>
         <div class="form-group">
             <label for="text">Коментар:</label>

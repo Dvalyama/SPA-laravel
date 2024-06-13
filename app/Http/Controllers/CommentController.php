@@ -24,7 +24,7 @@ class CommentController extends Controller
         ]);
 
         if ($request->input('captcha') != Session::get('captcha_text')) {
-            return redirect()->back()->withErrors(['captcha' => 'Невірна CAPTCHA'])->withInput();
+            return response()->json(['success' => false, 'message' => 'Невірна CAPTCHA']);
         }
 
         if ($request->hasFile('image')) {
@@ -59,14 +59,29 @@ class CommentController extends Controller
 
     public function index()
     {
-        // Отримання коментарів з дочірніми коментарями
-        $comments = Comment::whereNull('parent_id')->with('replies')->orderBy('created_at', 'desc')->get();
-        return response()->json(['success' => true, 'comments' => $comments]);
+        $comments = Comment::whereNull('parent_id')->orderBy('created_at', 'desc')->get();
+        $response = [];
+        $level = 1;
+        $response = $this->addComments($response, $comments, $level);
+
+        return response()->json(['success' => true, 'comments' => $response]);
+
+    }
+    private function addComments($response, $childComments, $level)
+    {
+        foreach ($childComments as  $comment){
+            $response[] = ['comment' => $comment, 'level' => $level];
+            $childComments = Comment::where('parent_id',$comment->id)->orderBy('created_at', 'desc')->get();
+            if(count($childComments)){
+                $response = $this->addComments($response, $childComments, $level+1);
+            }
+        }
+        return $response;
     }
 
     public function captcha(Request $request)
     {
-        $captcha_text = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 6);
+        $captcha_text = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 1);
         $request->session()->put('captcha_text', $captcha_text);
 
         $width = 150;
